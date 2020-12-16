@@ -26,14 +26,16 @@ REQUIRES = [
     "six>=1.10",
     "mlflow>=1.2.0",
     "google-cloud-storage>=1.19.0",
+    "google-auth>=1.11.0,<2.0dev",
+    # Regression due to https://github.com/googleapis/python-pubsub/issues/115
+    "google-api-core<=1.17.0",
     "boto3>=1.9.84",
     "urllib3>=1.23",
     "PyPrind>=2.11.2",
-    "google-auth>=1.11.0,<2.0dev",
     'Click>=7.0',
     "cloudpickle==1.2.2",
     "cookiecutter>=1.7.2",
-    "docker>=4.2.1"
+    "docker>=4.2.1",
 ]
 
 TEST_REQUIRES = [
