@@ -38,7 +38,7 @@ type Server struct {
 	httpClient *http.Client
 	logger     *zap.Logger
 
-	PreprocessHandler  func(ctx context.Context, request []byte) ([]byte, error)
+	PreprocessHandlers []func(ctx context.Context, request []byte) ([]byte, error)
 	PostprocessHandler func(ctx context.Context, request []byte) ([]byte, error)
 	LivenessHandler    func(w http.ResponseWriter, r *http.Request)
 }
@@ -66,12 +66,14 @@ func (s *Server) PredictHandler(w http.ResponseWriter, r *http.Request) {
 	s.logger.Debug("requestBody", zap.ByteString("requestBody", requestBody))
 
 	preprocessedRequestBody := requestBody
-	if s.PreprocessHandler != nil {
-		preprocessedRequestBody, err = s.PreprocessHandler(ctx, requestBody)
-		if err != nil {
-			s.logger.Error("preprocess error", zap.Error(err))
-			response.NewError(http.StatusInternalServerError, errors.Wrapf(err, "preprocessing error")).Write(w)
-			return
+	if len(s.PreprocessHandlers) > 0 {
+		for _, handler := range s.PreprocessHandlers {
+			preprocessedRequestBody, err = handler(ctx, preprocessedRequestBody)
+			if err != nil {
+				s.logger.Error("preprocess error", zap.Error(err))
+				response.NewError(http.StatusInternalServerError, errors.Wrapf(err, "preprocessing error")).Write(w)
+				return
+			}
 		}
 		s.logger.Debug("preprocess requestBody", zap.ByteString("preprocess_response", preprocessedRequestBody))
 	}

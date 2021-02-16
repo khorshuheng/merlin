@@ -1,0 +1,8 @@
+POST http://localhost:8081/v1/models/model:predict
+Content-Type: application/json
+
+{
+  "driver_id": 1
+}
+
+###

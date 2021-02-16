@@ -110,7 +110,7 @@ func TestServer_PredictHandler_WithPreprocess(t *testing.T) {
 			}
 			logger, _ := zap.NewDevelopment()
 			server := New(options, logger)
-			server.PreprocessHandler = mockPreprocessHandler
+			server.PreprocessHandlers = []func(ctx context.Context, request []byte) ([]byte, error) {mockPreprocessHandler}
 
 			server.PredictHandler(rr, req)
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"strconv"
@@ -28,6 +29,7 @@ func main() {
 		Feast  feast.Options
 
 		StandardTransformerConfigJSON string `envconfig:"STANDARD_TRANSFORMER_CONFIG" required:"true"`
+		CustomTransformerConfigJSON string `envconfig:"CUSTOM_TRANSFORMER_CONFIG"`
 
 		LogLevel string `envconfig:"LOG_LEVEL"`
 	}{}
@@ -66,7 +68,7 @@ func main() {
 	f := feast.NewTransformer(feastClient, config, &cfg.Feast, logger)
 
 	s := server.New(&cfg.Server, logger)
-	s.PreprocessHandler = f.Transform
+	s.PreprocessHandlers = []func(ctx context.Context, request []byte) ([]byte, error) {f.Transform}
 
 	s.Run()
 }
