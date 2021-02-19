@@ -50,7 +50,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT32",
-				JsonPath:  "$.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
@@ -62,7 +64,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT64",
-				JsonPath:  "$.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
@@ -74,7 +78,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "FLOAT",
-				JsonPath:  "$.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.FloatVal(1234),
@@ -86,7 +92,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "DOUBLE",
-				JsonPath:  "$.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.DoubleVal(1234),
@@ -98,7 +106,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "STRING",
-				JsonPath:  "$.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.StrVal("1234"),
@@ -110,7 +120,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT32",
-				JsonPath:  "$.float",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.float",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
@@ -122,7 +134,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT64",
-				JsonPath:  "$.float",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.float",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
@@ -134,7 +148,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "FLOAT",
-				JsonPath:  "$.float",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.float",
+				},
 			},
 			[]*feastType.Value{
 				feast.FloatVal(1234.111),
@@ -146,7 +162,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "DOUBLE",
-				JsonPath:  "$.float",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.float",
+				},
 			},
 			[]*feastType.Value{
 				feast.DoubleVal(1234.111),
@@ -158,7 +176,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "STRING",
-				JsonPath:  "$.float",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.float",
+				},
 			},
 			[]*feastType.Value{
 				feast.StrVal("1234.111"),
@@ -170,7 +190,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT32",
-				JsonPath:  "$.string",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.string",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
@@ -182,7 +204,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT64",
-				JsonPath:  "$.string",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.string",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
@@ -194,7 +218,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "FLOAT",
-				JsonPath:  "$.string",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.string",
+				},
 			},
 			[]*feastType.Value{
 				feast.FloatVal(1234),
@@ -206,7 +232,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "DOUBLE",
-				JsonPath:  "$.string",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.string",
+				},
 			},
 			[]*feastType.Value{
 				feast.DoubleVal(1234),
@@ -218,7 +246,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "STRING",
-				JsonPath:  "$.string",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.string",
+				},
 			},
 			[]*feastType.Value{
 				feast.StrVal("1234"),
@@ -230,7 +260,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "BOOL",
-				JsonPath:  "$.boolean",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.boolean",
+				},
 			},
 			[]*feastType.Value{
 				feast.BoolVal(true),
@@ -242,7 +274,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "BOOL",
-				JsonPath:  "$.booleanString",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.booleanString",
+				},
 			},
 			[]*feastType.Value{
 				feast.BoolVal(false),
@@ -254,7 +288,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT32",
-				JsonPath:  "$.array[*].integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.array[*].integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1111),
@@ -267,7 +303,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "INT32",
-				JsonPath:  "$.struct.integer",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.struct.integer",
+				},
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
@@ -279,7 +317,9 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			&transformer.Entity{
 				Name:      "my_entity",
 				ValueType: "BYTES",
-				JsonPath:  "$.booleanString",
+				Extractor: &transformer.Entity_JsonPath{
+					JsonPath: "$.booleanString",
+				},
 			},
 			nil,
 			errors.New("unsupported type BYTES"),
@@ -308,7 +348,9 @@ func BenchmarkGetValuesFromJSONPayload100Entity(b *testing.B) {
 		Result, _ = getValuesFromJSONPayload(benchData, &transformer.Entity{
 			Name:      "",
 			ValueType: "INT32",
-			JsonPath:  "$.array[*].id",
+			Extractor: &transformer.Entity_JsonPath{
+				JsonPath: "$.array[*].id",
+			},
 		})
 	}
 }
@@ -319,7 +361,9 @@ func BenchmarkGetValuesFromJSONPayload1StringEntity(b *testing.B) {
 		Result, _ = getValuesFromJSONPayload(benchData, &transformer.Entity{
 			Name:      "",
 			ValueType: "STRING",
-			JsonPath:  "$.string",
+			Extractor: &transformer.Entity_JsonPath{
+				JsonPath: "$.string",
+			},
 		})
 	}
 }
@@ -330,7 +374,9 @@ func BenchmarkGetValuesFromJSONPayload1IntegerEntity(b *testing.B) {
 		Result, _ = getValuesFromJSONPayload(benchData, &transformer.Entity{
 			Name:      "",
 			ValueType: "INT32",
-			JsonPath:  "$.integer",
+			Extractor: &transformer.Entity_JsonPath{
+				JsonPath: "$.integer",
+			},
 		})
 	}
 }
@@ -341,7 +387,9 @@ func BenchmarkGetValuesFromJSONPayload1FloatEntity(b *testing.B) {
 		Result, _ = getValuesFromJSONPayload(benchData, &transformer.Entity{
 			Name:      "",
 			ValueType: "DOUBLE",
-			JsonPath:  "$.float",
+			Extractor: &transformer.Entity_JsonPath{
+				JsonPath: "$.float",
+			},
 		})
 	}
 }

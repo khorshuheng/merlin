@@ -3,7 +3,6 @@ package feast
 import (
 	"context"
 	"fmt"
-
 	"github.com/feast-dev/feast/sdk/go/protos/feast/core"
 	"github.com/pkg/errors"
 
@@ -52,8 +51,19 @@ func ValidateTransformerConfig(ctx context.Context, coreClient core.CoreServiceC
 				return NewValidationError("entity not found: " + entity.Name)
 			}
 
-			if len(entity.JsonPath) == 0 {
-				return NewValidationError(fmt.Sprintf("json path for %s is not specified", entity.Name))
+			if entity.Extractor == nil {
+				return NewValidationError("Either json_path or udf must be specified")
+			}
+
+			switch entity.Extractor.(type) {
+			case *transformer.Entity_JsonPath:
+				if len(entity.GetJsonPath()) == 0 {
+					return NewValidationError(fmt.Sprintf("json path for %s is not specified", entity.Name))
+				}
+			case *transformer.Entity_Udf:
+				if len(entity.GetUdf()) == 0 {
+					return NewValidationError(fmt.Sprintf("udf for %s is not specified", entity.Name))
+				}
 			}
 
 			if spec.ValueType.String() != entity.ValueType {

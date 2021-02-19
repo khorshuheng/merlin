@@ -2,6 +2,7 @@ package feast
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -21,7 +22,15 @@ func getValuesFromJSONPayload(body []byte, entity *transformer.Entity) ([]*feast
 		return nil, err
 	}
 
-	o, err := jsonpath.JsonPathLookup(nodesBody, entity.JsonPath)
+	var o interface{}
+	switch entity.Extractor.(type) {
+	case *transformer.Entity_JsonPath:
+		o, err = jsonpath.JsonPathLookup(nodesBody, entity.GetJsonPath())
+	case *transformer.Entity_Udf:
+		o = nil
+		err = errors.New("Unimplemented")
+	}
+
 	if err != nil {
 		return nil, err
 	}

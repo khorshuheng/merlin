@@ -96,6 +96,39 @@ func TestValidateTransformerConfig(t *testing.T) {
 			NewValidationError("entity not found: customer_id"),
 		},
 		{
+			"extractor not specified",
+			&transformer.StandardTransformerConfig{TransformerConfig: &transformer.TransformerConfig{
+				Feast: []*transformer.FeatureTable{
+					{
+						Project: "default",
+						Entities: []*transformer.Entity{
+							{
+								Name: "customer_id",
+							},
+						},
+						Features: []*transformer.Feature{
+							{
+								Name: "total_booking",
+							},
+						},
+					},
+				},
+			},
+			},
+			&core.ListEntitiesResponse{
+				Entities: []*core.Entity{
+					{
+						Spec: &core.EntitySpecV2{
+							Name:      "customer_id",
+							ValueType: types.ValueType_STRING,
+						},
+					},
+				},
+			},
+			nil,
+			NewValidationError("Either json_path or udf must be specified"),
+		},
+		{
 			"json path not specified",
 			&transformer.StandardTransformerConfig{TransformerConfig: &transformer.TransformerConfig{
 				Feast: []*transformer.FeatureTable{
@@ -104,6 +137,8 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name: "customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+								},
 							},
 						},
 						Features: []*transformer.Feature{
@@ -137,7 +172,9 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "INTEGER",
 							},
 						},
@@ -172,12 +209,16 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "STRING",
 							},
 							{
 								Name:      "hour_of_day",
-								JsonPath:  "$.hour_of_day",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.hour_of_day",
+								},
 								ValueType: "INT32",
 							},
 						},
@@ -222,12 +263,16 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "STRING",
 							},
 							{
 								Name:      "hour_of_day",
-								JsonPath:  "$.hour_of_day",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.hour_of_day",
+								},
 								ValueType: "INT32",
 							},
 						},
@@ -278,12 +323,16 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "STRING",
 							},
 							{
 								Name:      "hour_of_day",
-								JsonPath:  "$.hour_of_day",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.hour_of_day",
+								},
 								ValueType: "INT32",
 							},
 						},
@@ -334,12 +383,16 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "STRING",
 							},
 							{
 								Name:      "hour_of_day",
-								JsonPath:  "$.hour_of_day",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.hour_of_day",
+								},
 								ValueType: "INT32",
 							},
 						},
@@ -390,12 +443,16 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Entities: []*transformer.Entity{
 							{
 								Name:      "customer_id",
-								JsonPath:  "$.customer_id",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.customer_id",
+								},
 								ValueType: "STRING",
 							},
 							{
 								Name:      "hour_of_day",
-								JsonPath:  "$.hour_of_day",
+								Extractor: &transformer.Entity_JsonPath{
+									JsonPath: "$.hour_of_day",
+								},
 								ValueType: "INT32",
 							},
 						},
