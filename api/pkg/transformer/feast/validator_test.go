@@ -136,9 +136,8 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name: "customer_id",
-								Extractor: &transformer.Entity_JsonPath{
-								},
+								Name:      "customer_id",
+								Extractor: &transformer.Entity_JsonPath{},
 							},
 						},
 						Features: []*transformer.Feature{
@@ -171,7 +170,7 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
@@ -208,14 +207,14 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
 								ValueType: "STRING",
 							},
 							{
-								Name:      "hour_of_day",
+								Name: "hour_of_day",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.hour_of_day",
 								},
@@ -262,14 +261,14 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
 								ValueType: "STRING",
 							},
 							{
-								Name:      "hour_of_day",
+								Name: "hour_of_day",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.hour_of_day",
 								},
@@ -322,14 +321,14 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
 								ValueType: "STRING",
 							},
 							{
-								Name:      "hour_of_day",
+								Name: "hour_of_day",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.hour_of_day",
 								},
@@ -382,14 +381,14 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
 								ValueType: "STRING",
 							},
 							{
-								Name:      "hour_of_day",
+								Name: "hour_of_day",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.hour_of_day",
 								},
@@ -442,14 +441,14 @@ func TestValidateTransformerConfig(t *testing.T) {
 						Project: "default",
 						Entities: []*transformer.Entity{
 							{
-								Name:      "customer_id",
+								Name: "customer_id",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.customer_id",
 								},
 								ValueType: "STRING",
 							},
 							{
-								Name:      "hour_of_day",
+								Name: "hour_of_day",
 								Extractor: &transformer.Entity_JsonPath{
 									JsonPath: "$.hour_of_day",
 								},

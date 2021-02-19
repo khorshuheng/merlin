@@ -2,7 +2,6 @@ package feast
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -11,6 +10,8 @@ import (
 	"github.com/oliveagle/jsonpath"
 
 	"github.com/gojek/merlin/pkg/transformer"
+
+	"github.com/antonmedv/expr"
 )
 
 func getValuesFromJSONPayload(body []byte, entity *transformer.Entity) ([]*feastType.Value, error) {
@@ -27,8 +28,22 @@ func getValuesFromJSONPayload(body []byte, entity *transformer.Entity) ([]*feast
 	case *transformer.Entity_JsonPath:
 		o, err = jsonpath.JsonPathLookup(nodesBody, entity.GetJsonPath())
 	case *transformer.Entity_Udf:
-		o = nil
-		err = errors.New("Unimplemented")
+		env := NewUdfEnv(nodesBody)
+		compile, err := expr.Compile(entity.GetUdf(), expr.Env(env))
+		if err != nil {
+			return nil, err
+		}
+		exprResult, err := expr.Run(compile, env)
+		if err != nil {
+			return nil, err
+		}
+		udfResult := exprResult.(UdfResult)
+
+		if udfResult.Error != nil {
+			return nil, udfResult.Error
+		}
+
+		o = udfResult.Value
 	}
 
 	if err != nil {

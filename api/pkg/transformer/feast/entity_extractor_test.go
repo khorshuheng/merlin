@@ -2,6 +2,7 @@ package feast
 
 import (
 	"errors"
+	"github.com/mmcloughlin/geohash"
 	"testing"
 
 	feast "github.com/feast-dev/feast/sdk/go"
@@ -18,6 +19,8 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 		"string" : "1234",
 		"boolean" : true,
 		"booleanString" : "false",
+		"latitude": 1.0,
+		"longitude": 2.0,
 		"struct" : {
                 "integer" : 1234,
 				"float" : 1234.111,
@@ -309,6 +312,20 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 			},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
+			},
+			nil,
+		},
+		{
+			"Geohash udf",
+			&transformer.Entity{
+				Name:      "my_geohash",
+				ValueType: "STRING",
+				Extractor: &transformer.Entity_Udf{
+					Udf: "geohash(\"$.latitude\", \"$.longitude\")",
+				},
+			},
+			[]*feastType.Value{
+				feast.StrVal(geohash.Encode(1.0, 2.0)),
 			},
 			nil,
 		},

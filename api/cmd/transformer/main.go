@@ -16,8 +16,6 @@ import (
 	"github.com/gojek/merlin/pkg/transformer"
 	"github.com/gojek/merlin/pkg/transformer/feast"
 	"github.com/gojek/merlin/pkg/transformer/server"
-
-	_ "github.com/antonmedv/expr"
 )
 
 func init() {
