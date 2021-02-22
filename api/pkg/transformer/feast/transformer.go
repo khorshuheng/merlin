@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/antonmedv/expr"
+	"github.com/antonmedv/expr/vm"
 	"math"
 	"strings"
 	"time"
@@ -62,12 +64,14 @@ type Transformer struct {
 	logger        *zap.Logger
 	options       *Options
 	defaultValues map[string]*types.Value
+	compiledUdfs  map[string]*vm.Program
 }
 
 // NewTransformer initializes a new Transformer.
-func NewTransformer(feastClient feast.Client, config *transformer.StandardTransformerConfig, options *Options, logger *zap.Logger) *Transformer {
+func NewTransformer(feastClient feast.Client, config *transformer.StandardTransformerConfig, options *Options, logger *zap.Logger) (*Transformer, error) {
 	defaultValues := make(map[string]*types.Value)
-	// populate default values
+	compiledUdfs := make(map[string]*vm.Program)
+	// populate default values and compile udf if defined
 	for _, ft := range config.TransformerConfig.Feast {
 		for _, f := range ft.Features {
 			if len(f.DefaultValue) != 0 {
@@ -80,6 +84,18 @@ func NewTransformer(feastClient feast.Client, config *transformer.StandardTransf
 				defaultValues[f.Name] = defVal
 			}
 		}
+
+		for _, e := range ft.Entities {
+			switch e.Extractor.(type) {
+			case *transformer.Entity_Udf:
+				compiledUdf, err := expr.Compile(e.GetUdf(), expr.Env(UdfEnv{}))
+				if err != nil {
+					return nil, err
+				}
+				compiledUdfs[e.Name] = compiledUdf
+			}
+
+		}
 	}
 
 	return &Transformer{
@@ -88,7 +104,7 @@ func NewTransformer(feastClient feast.Client, config *transformer.StandardTransf
 		options:       options,
 		logger:        logger,
 		defaultValues: defaultValues,
-	}
+	}, nil
 }
 
 type FeastFeature struct {
@@ -138,7 +154,7 @@ func (t *Transformer) Transform(ctx context.Context, request []byte) ([]byte, er
 }
 
 func (t *Transformer) getFeastFeature(ctx context.Context, request []byte, config *transformer.FeatureTable) (*FeastFeature, error) {
-	entities, err := buildEntitiesRequest(request, config.Entities)
+	entities, err := buildEntitiesRequest(request, config.Entities, t.compiledUdfs)
 	if err != nil {
 		return nil, err
 	}
@@ -224,11 +240,11 @@ func (t *Transformer) getFeastFeature(ctx context.Context, request []byte, confi
 	}, nil
 }
 
-func buildEntitiesRequest(request []byte, configEntities []*transformer.Entity) ([]feast.Row, error) {
+func buildEntitiesRequest(request []byte, configEntities []*transformer.Entity, compiledUdfs map[string]*vm.Program) ([]feast.Row, error) {
 	entities := []feast.Row{}
 
 	for _, configEntity := range configEntities {
-		vals, err := getValuesFromJSONPayload(request, configEntity)
+		vals, err := getValuesFromJSONPayload(request, configEntity, compiledUdfs)
 		if err != nil {
 			return nil, fmt.Errorf("unable to extract entity %s: %v", configEntity.Name, err)
 		}

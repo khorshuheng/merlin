@@ -3,6 +3,8 @@ package feast
 import (
 	"context"
 	"encoding/json"
+	"github.com/antonmedv/expr/vm"
+	"github.com/mmcloughlin/geohash"
 	"reflect"
 	"testing"
 
@@ -31,12 +33,13 @@ func TestTransformer_Transform(t *testing.T) {
 		response *feast.OnlineFeaturesResponse
 	}
 	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		mockFeast []mockFeast
-		want      []byte
-		wantErr   bool
+		name         string
+		fields       fields
+		args         args
+		mockFeast    []mockFeast
+		want         []byte
+		wantErr      bool
+		compiledUdfs map[string]*vm.Program
 	}{
 		{
 			name: "one config: retrieve one entity, one feature",
@@ -472,10 +475,13 @@ func TestTransformer_Transform(t *testing.T) {
 				})).Return(m.response, nil)
 			}
 
-			f := NewTransformer(mockFeast, tt.fields.config, &Options{
+			f, err := NewTransformer(mockFeast, tt.fields.config, &Options{
 				StatusMonitoringEnabled: true,
 				ValueMonitoringEnabled:  true,
 			}, logger)
+			if err != nil {
+				panic(err)
+			}
 
 			got, err := f.Transform(tt.args.ctx, tt.args.request)
 			if (err != nil) != tt.wantErr {
@@ -495,6 +501,7 @@ func Test_buildEntitiesRequest(t *testing.T) {
 	type args struct {
 		request        []byte
 		configEntities []*transformer.Entity
+		compiledUdfs   map[string]*vm.Program
 	}
 	tests := []struct {
 		name    string
@@ -1043,10 +1050,32 @@ func Test_buildEntitiesRequest(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "geohash entity from latitude and longitude",
+			args: args{
+				request: []byte(`{"latitude": 1.0, "longitude": 2.0}`),
+				configEntities: []*transformer.Entity{
+					{
+						Name:      "my_geohash",
+						ValueType: "STRING",
+						Extractor: &transformer.Entity_Udf{
+							Udf: "Geohash(\"$.latitude\", \"$.longitude\")",
+						},
+					},
+				},
+				compiledUdfs: map[string]*vm.Program{
+					"my_geohash": mustCompileUdf("Geohash(\"$.latitude\", \"$.longitude\")"),
+				},
+			},
+			want: []feast.Row{
+				{"my_geohash": feast.StrVal(geohash.Encode(1.0, 2.0))},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := buildEntitiesRequest(tt.args.request, tt.args.configEntities)
+			got, err := buildEntitiesRequest(tt.args.request, tt.args.configEntities, tt.args.compiledUdfs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("buildEntitiesRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return

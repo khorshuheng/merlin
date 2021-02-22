@@ -2,6 +2,7 @@ package feast
 
 import (
 	"errors"
+	"github.com/antonmedv/expr/vm"
 	"github.com/mmcloughlin/geohash"
 	"testing"
 
@@ -45,6 +46,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 	tests := []struct {
 		name         string
 		entityConfig *transformer.Entity
+		compiledUdfs map[string]*vm.Program
 		expValues    []*feastType.Value
 		expError     error
 	}{
@@ -57,6 +59,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
 			},
@@ -71,6 +74,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
 			},
@@ -85,6 +89,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.FloatVal(1234),
 			},
@@ -99,6 +104,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.DoubleVal(1234),
 			},
@@ -113,6 +119,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.StrVal("1234"),
 			},
@@ -127,6 +134,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.float",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
 			},
@@ -141,6 +149,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.float",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
 			},
@@ -155,6 +164,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.float",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.FloatVal(1234.111),
 			},
@@ -169,6 +179,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.float",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.DoubleVal(1234.111),
 			},
@@ -183,6 +194,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.float",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.StrVal("1234.111"),
 			},
@@ -197,6 +209,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.string",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
 			},
@@ -211,6 +224,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.string",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int64Val(1234),
 			},
@@ -225,6 +239,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.string",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.FloatVal(1234),
 			},
@@ -239,6 +254,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.string",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.DoubleVal(1234),
 			},
@@ -253,6 +269,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.string",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.StrVal("1234"),
 			},
@@ -267,6 +284,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.boolean",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.BoolVal(true),
 			},
@@ -281,6 +299,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.booleanString",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.BoolVal(false),
 			},
@@ -295,6 +314,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.array[*].integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int32Val(1111),
 				feast.Int32Val(2222),
@@ -310,6 +330,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.struct.integer",
 				},
 			},
+			map[string]*vm.Program{},
 			[]*feastType.Value{
 				feast.Int32Val(1234),
 			},
@@ -321,8 +342,11 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 				Name:      "my_geohash",
 				ValueType: "STRING",
 				Extractor: &transformer.Entity_Udf{
-					Udf: "geohash(\"$.latitude\", \"$.longitude\")",
+					Udf: "Geohash(\"$.latitude\", \"$.longitude\")",
 				},
+			},
+			map[string]*vm.Program{
+				"my_geohash": mustCompileUdf("Geohash(\"$.latitude\", \"$.longitude\")"),
 			},
 			[]*feastType.Value{
 				feast.StrVal(geohash.Encode(1.0, 2.0)),
@@ -338,6 +362,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 					JsonPath: "$.booleanString",
 				},
 			},
+			map[string]*vm.Program{},
 			nil,
 			errors.New("unsupported type BYTES"),
 		},
@@ -345,7 +370,7 @@ func TestGetValuesFromJSONPayload(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			actual, err := getValuesFromJSONPayload(testData, test.entityConfig)
+			actual, err := getValuesFromJSONPayload(testData, test.entityConfig, test.compiledUdfs)
 			if err != nil {
 				if test.expError != nil {
 					assert.EqualError(t, err, test.expError.Error())
@@ -368,7 +393,7 @@ func BenchmarkGetValuesFromJSONPayload100Entity(b *testing.B) {
 			Extractor: &transformer.Entity_JsonPath{
 				JsonPath: "$.array[*].id",
 			},
-		})
+		}, map[string]*vm.Program{})
 	}
 }
 
@@ -381,7 +406,7 @@ func BenchmarkGetValuesFromJSONPayload1StringEntity(b *testing.B) {
 			Extractor: &transformer.Entity_JsonPath{
 				JsonPath: "$.string",
 			},
-		})
+		}, map[string]*vm.Program{})
 	}
 }
 
@@ -394,7 +419,7 @@ func BenchmarkGetValuesFromJSONPayload1IntegerEntity(b *testing.B) {
 			Extractor: &transformer.Entity_JsonPath{
 				JsonPath: "$.integer",
 			},
-		})
+		}, map[string]*vm.Program{})
 	}
 }
 
@@ -407,12 +432,32 @@ func BenchmarkGetValuesFromJSONPayload1FloatEntity(b *testing.B) {
 			Extractor: &transformer.Entity_JsonPath{
 				JsonPath: "$.float",
 			},
-		})
+		}, map[string]*vm.Program{})
+	}
+}
+
+func BenchmarkGetValuesFromJSONPayloadGeohashUdf(b *testing.B) {
+	b.ReportAllocs()
+	udfString := "Geohash(\"$.latitude\", \"$.longitude\")"
+	compiledUdf := mustCompileUdf(udfString)
+	for i := 0; i < b.N; i++ {
+		Result, _ = getValuesFromJSONPayload(benchData, &transformer.Entity{
+			Name:      "my_geohash",
+			ValueType: "STRING",
+			Extractor: &transformer.Entity_Udf{
+				Udf: udfString,
+			},
+		},
+			map[string]*vm.Program{
+				"my_geohash": compiledUdf,
+			})
 	}
 }
 
 var Result []*feastType.Value
 var benchData = []byte(`{
+  "latitude": 1.0,
+  "longitude": 1.0,
   "string": "string_value",
   "integer" : 1234,
   "float" : 1234.111,

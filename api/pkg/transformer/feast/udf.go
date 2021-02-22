@@ -3,6 +3,8 @@ package feast
 import (
 	"errors"
 	"fmt"
+	"github.com/antonmedv/expr"
+	"github.com/antonmedv/expr/vm"
 	"github.com/mmcloughlin/geohash"
 	"github.com/oliveagle/jsonpath"
 	"reflect"
@@ -14,15 +16,15 @@ type UdfResult struct {
 	Error error
 }
 
-func NewUdfEnv(jsonRequestBody interface{}) map[string]interface{} {
-	return map[string]interface{}{
-		"geohash": func(latitudeJsonPath, longitudeJsonPath string) interface{} {
-			value, err := ExtractGeohash(jsonRequestBody, latitudeJsonPath, longitudeJsonPath)
-			return UdfResult{
-				Value: value,
-				Error: err,
-			}
-		},
+type UdfEnv struct {
+	UnmarshalledJsonRequest interface{}
+}
+
+func (env UdfEnv) Geohash(latitudeJsonPath, longitudeJsonPath string) UdfResult {
+	value, err := extractGeohash(env.UnmarshalledJsonRequest, latitudeJsonPath, longitudeJsonPath)
+	return UdfResult{
+		Value: value,
+		Error: err,
 	}
 }
 
@@ -57,7 +59,7 @@ func toFloat64(o interface{}) (float64, error) {
 
 }
 
-func ExtractGeohash(jsonRequestBody interface{}, latitudeJsonPath, longitudeJsonPath string) (interface{}, error) {
+func extractGeohash(jsonRequestBody interface{}, latitudeJsonPath, longitudeJsonPath string) (interface{}, error) {
 	latitude, err := jsonpath.JsonPathLookup(jsonRequestBody, latitudeJsonPath)
 	if err != nil {
 		return nil, err
@@ -97,4 +99,12 @@ func ExtractGeohash(jsonRequestBody interface{}, latitudeJsonPath, longitudeJson
 		return geohashes, nil
 	}
 
+}
+
+func mustCompileUdf(udfString string) *vm.Program {
+	compiled, err := expr.Compile(udfString, expr.Env(UdfEnv{}))
+	if err != nil {
+		panic(err)
+	}
+	return compiled
 }

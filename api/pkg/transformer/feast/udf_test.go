@@ -3,23 +3,10 @@ package feast
 import (
 	"encoding/json"
 	"errors"
-	"github.com/antonmedv/expr"
 	"github.com/mmcloughlin/geohash"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
-
-func TestUdfCompilation(t *testing.T) {
-	testJsonString := []byte(`{}`)
-	var testJsonUnmarshallled interface{}
-	err := json.Unmarshal(testJsonString, &testJsonUnmarshallled)
-	if err != nil {
-		panic(err)
-	}
-	env := NewUdfEnv(testJsonUnmarshallled)
-	_, err = expr.Compile("geohash(\"\", \"\")", expr.Env(env))
-	assert.NoError(t, err)
-}
 
 func TestExtractGeohash(t *testing.T) {
 	testJsonString := []byte(`{
@@ -96,7 +83,7 @@ func TestExtractGeohash(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual, err := ExtractGeohash(testJsonUnmarshallled, test.latitudeJsonPath, test.longitudeJsonPath)
+			actual, err := extractGeohash(testJsonUnmarshallled, test.latitudeJsonPath, test.longitudeJsonPath)
 			if err != nil {
 				if test.expError != nil {
 					assert.EqualError(t, err, test.expError.Error())

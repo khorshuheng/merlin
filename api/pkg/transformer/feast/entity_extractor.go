@@ -3,6 +3,7 @@ package feast
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/antonmedv/expr/vm"
 	"strconv"
 
 	feast "github.com/feast-dev/feast/sdk/go"
@@ -14,7 +15,7 @@ import (
 	"github.com/antonmedv/expr"
 )
 
-func getValuesFromJSONPayload(body []byte, entity *transformer.Entity) ([]*feastType.Value, error) {
+func getValuesFromJSONPayload(body []byte, entity *transformer.Entity, compiledUdfs map[string]*vm.Program) ([]*feastType.Value, error) {
 	feastValType := feastType.ValueType_Enum(feastType.ValueType_Enum_value[entity.ValueType])
 
 	var nodesBody interface{}
@@ -28,12 +29,9 @@ func getValuesFromJSONPayload(body []byte, entity *transformer.Entity) ([]*feast
 	case *transformer.Entity_JsonPath:
 		o, err = jsonpath.JsonPathLookup(nodesBody, entity.GetJsonPath())
 	case *transformer.Entity_Udf:
-		env := NewUdfEnv(nodesBody)
-		compile, err := expr.Compile(entity.GetUdf(), expr.Env(env))
-		if err != nil {
-			return nil, err
-		}
-		exprResult, err := expr.Run(compile, env)
+		env := UdfEnv{nodesBody}
+		udf := compiledUdfs[entity.Name]
+		exprResult, err := expr.Run(udf, env)
 		if err != nil {
 			return nil, err
 		}
